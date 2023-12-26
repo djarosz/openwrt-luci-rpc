@@ -85,14 +85,12 @@ class OpenWrtLuciRPC:
 
         # get VERSION_ID from os-release if exists or get
         # DISTRIB_RELEASE from openwrt_release
-        shell_command = "if [ -f \"/etc/os-release\" ]; \
-                            then awk -F= '$1==\"VERSION_ID\" \
-                            { print $2 ;}' \
-                            /etc/os-release; \
-                            else awk -F= '$1==\"DISTRIB_RELEASE\" \
-                            { print $2 ;}' \
-                            /etc/openwrt_release; fi | \
-                            tr -d \\'\\\""
+        shell_command = "if [ -f /etc/os-release ] && grep -qE ^VERSION_ID= /etc/os-release; then \
+                             awk -F= '/VERSION_ID=/ { print $2 }' /etc/os-release ;\
+                         else \
+                             awk -F= '/DISTRIB_RELEASE=/ { print $2 }' /etc/openwrt_release ;\
+                         fi \
+                         | tr -d \\'\\\""
 
         rcp_sys_version_call = Constants.\
             LUCI_RPC_SYS_PATH.format(self.host_api_url), "exec"
